@@ -1,0 +1,46 @@
+name: Update Data Centers Parquet
+
+on:
+  schedule:
+    # Runs at 08:00 UTC/02:00 CST every Sunday
+    - cron: '0 8 * * 0'  
+  workflow_dispatch: # Allows you to run it manually from the UI
+
+jobs:
+  update-parquet:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # Required to upload to releases
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pandas geopandas shapely requests pyarrow numpy
+
+      - name: Run Data Center Scraper
+        run: python update_data.py
+
+      - name: Upload updated Parquet to Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Fetch the latest release tag
+          LATEST_TAG=$(gh release view --json tagName -q .tagName)
+          
+          # Check if the python script generated a new parquet file
+          if [ -f "data_centers.parquet" ]; then
+            echo "Uploading updated parquet to release: $LATEST_TAG"
+            # --clobber overwrites the existing file of the same name in the release
+            gh release upload $LATEST_TAG data_centers.parquet --clobber
+          else
+            echo "No updated parquet file found. Skipping upload."
+          fi
