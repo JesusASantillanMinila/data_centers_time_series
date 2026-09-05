@@ -2,8 +2,8 @@ name: Update Data Centers Parquet
 
 on:
   schedule:
-    # Runs at 08:00 UTC/02:00 CST every Sunday
-    - cron: '0 8 * * 0'  
+    # Runs at 08:00 UTC/02:00 CST every Monday
+    - cron: '0 8 * * 1'  
   workflow_dispatch: # Allows you to run it manually from the UI
 
 jobs:
