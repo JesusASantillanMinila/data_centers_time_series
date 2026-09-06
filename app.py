@@ -103,8 +103,5 @@ if not filtered_df.empty:
     )
     st.plotly_chart(fig, use_container_width=True)
     
-    # Show raw filtered data
-    with st.expander("View Raw Data"):
-        st.dataframe(filtered_df, use_container_width=True)
 else:
     st.warning("No data found for the selected filter combination.")
